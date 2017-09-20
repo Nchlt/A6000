@@ -25,7 +25,7 @@ let flatten_main p =
       let tmp = Printf.sprintf "_tmp_%i" !cpt in
       add_symb tmp;
       tmp
-  in
+  in (*test push*)
 
   (* flatten_block: S.block -> T.instruction list *)
   let rec flatten_block = function
