@@ -10,7 +10,7 @@ let generate_main p =
     try  AllocatedAst.Symb_Tbl.find id symb_tbl
     with Not_found -> failwith (Printf.sprintf "Node %s not found" id)
   in
-  
+
   let rec generate_block = function
     | []       -> nop
     | (l,i)::b -> comment l @@ generate_instr i @@ generate_block b
@@ -20,12 +20,17 @@ let generate_main p =
   and load_value r : AllocatedAst.value -> 'a Mips.asm = function
     | Identifier(id) -> (match find_alloc id with
 	| Stack o -> lw r o ~$fp
-	| _       -> failwith "A completer")
+	| Reg r2 -> move r r2      
     | _              -> failwith "A completer"
 
   and generate_instr : AllocatedAst.instruction -> 'a Mips.asm = function
     | Print(v) -> load_value ~$a0 v @@ li ~$v0 11 @@ syscall
-    | _        -> failwith "A completer"     
+    | Goto(l) -> b l (* branchemet sur l'étiquette en question *)
+    | Label(l) -> label l
+    | CondGoto(v, l) ->
+      load_value t0 v @@ bnez t0 l
+
+    | _        -> failwith "A completer"
   in
 
   let init =
@@ -38,7 +43,7 @@ let generate_main p =
   in
 
   let close = li v0 10 @@ syscall in
-  
+
   let built_ins =
     label "atoi"
     @@ move t0 a0
@@ -63,6 +68,6 @@ let generate_main p =
     @@ move v0 t1
     @@ jr   ra
   in
-  
+
   let asm = generate_block p.code in
   { text = init @@ asm @@ close @@ built_ins; data = nop }

@@ -13,6 +13,10 @@ let allocate_main reg_flag p =
       S.Symb_Tbl.mapi (fun id (info: S.identifier_info) ->
 	match info with
 	  | FormalX -> T.Stack 0
+    | Local ->
+      current_offset := !current_offset - 4;
+      T.Stack !current_offset
+
 	  | _       -> failwith "A completer"
       ) p.S.locals
   in

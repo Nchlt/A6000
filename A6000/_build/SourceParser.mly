@@ -4,6 +4,7 @@
 
 %}
 
+(* Définition des lexèmes et propriétés *)
 %token <string> IDENT
 %token BEGIN END
 %token SEMI
@@ -11,13 +12,16 @@
 %token PRINT
 %token EOF
 %token MAIN
+%token PLUS
+%token MULT
 
-%start main
+%start main (* Non terminal  principal *)
 %type <SourceAst.main> main
 
-%%
+%% (* <- Séparation *)
+(* Règles de reconnaissance *)
 
-main:
+main: (* non terminal *)
 | MAIN; BEGIN; INT; x=IDENT; END;
   BEGIN; vds=var_decls; is=instructions; END; EOF  {
     let infox = { typ=TypInteger; kind=FormalX } in
@@ -38,12 +42,16 @@ instructions:
 ;
 
 instruction:
-| PRINT; BEGIN; e=expression; END         { Print(e)          }
+(* On traduit les règles de grammaire { instruction a faire } *)
+| PRINT(*$0*); BEGIN(*$1*); e=expression(*$2*); END (*$3*)  { Print(e)   }
+(*au lieu d'utiliser les $ varaibles comme en yacc ici on fait e =...*)
 (* À compléter *)
 ;
 
 expression:
 | loc=location                            { Location(loc)     }
+| e1 = expression; PLUS; e2 = expression { Binop(Add, e1, e2) }
+| e1 = expression; MULT; e2 = expression { Binop(Mult, e1, e2) }
 (* À compléter *)
 ;
 

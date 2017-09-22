@@ -4,6 +4,8 @@
 type token = 
   | SEMI
   | PRINT
+  | PLUS
+  | MULT
   | MAIN
   | INT
   | IDENT of (string)
