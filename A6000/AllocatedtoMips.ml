@@ -19,17 +19,15 @@ let generate_main p =
      dans le registre [r]. *)
   and load_value r : AllocatedAst.value -> 'a Mips.asm = function
     | Identifier(id) -> (match find_alloc id with
-	| Stack o -> lw r o ~$fp
-	| Reg r2 -> move r r2      
+      | Stack o -> lw r o ~$fp)
+  	  (* | Reg r2 -> move r r2) *)
     | _              -> failwith "A completer"
 
   and generate_instr : AllocatedAst.instruction -> 'a Mips.asm = function
     | Print(v) -> load_value ~$a0 v @@ li ~$v0 11 @@ syscall
     | Goto(l) -> b l (* branchemet sur l'étiquette en question *)
     | Label(l) -> label l
-    | CondGoto(v, l) ->
-      load_value t0 v @@ bnez t0 l
-
+    | CondGoto(v, l) -> load_value t0 v @@ bnez t0 l
     | _        -> failwith "A completer"
   in
 

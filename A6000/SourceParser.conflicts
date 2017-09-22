@@ -1,0 +1,58 @@
+
+** Conflict (shift/reduce) in state 16.
+** Tokens involved: PLUS MULT
+** The following explanations concentrate on token PLUS.
+** This state is reached from main after reading:
+
+MAIN BEGIN INT IDENT END BEGIN var_decls PRINT BEGIN expression MULT expression 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+main 
+MAIN BEGIN INT IDENT END BEGIN var_decls instructions END EOF 
+                                         instruction SEMI instructions 
+                                         PRINT BEGIN expression END 
+                                                     (?)
+
+** In state 16, looking ahead at PLUS, shifting is permitted
+** because of the following sub-derivation:
+
+expression MULT expression 
+                expression . PLUS expression 
+
+** In state 16, looking ahead at PLUS, reducing production
+** expression -> expression MULT expression 
+** is permitted because of the following sub-derivation:
+
+expression PLUS expression // lookahead token appears
+expression MULT expression . 
+
+** Conflict (shift/reduce) in state 14.
+** Tokens involved: PLUS MULT
+** The following explanations concentrate on token PLUS.
+** This state is reached from main after reading:
+
+MAIN BEGIN INT IDENT END BEGIN var_decls PRINT BEGIN expression PLUS expression 
+
+** The derivations that appear below have the following common factor:
+** (The question mark symbol (?) represents the spot where the derivations begin to differ.)
+
+main 
+MAIN BEGIN INT IDENT END BEGIN var_decls instructions END EOF 
+                                         instruction SEMI instructions 
+                                         PRINT BEGIN expression END 
+                                                     (?)
+
+** In state 14, looking ahead at PLUS, shifting is permitted
+** because of the following sub-derivation:
+
+expression PLUS expression 
+                expression . PLUS expression 
+
+** In state 14, looking ahead at PLUS, reducing production
+** expression -> expression PLUS expression 
+** is permitted because of the following sub-derivation:
+
+expression PLUS expression // lookahead token appears
+expression PLUS expression . 

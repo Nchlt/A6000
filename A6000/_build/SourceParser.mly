@@ -15,6 +15,10 @@
 %token PLUS
 %token MULT
 
+(* Priotités pour résoudre le conflit shift/reduce *)
+/*%nonassoc PLUS
+%nonassoc MULT*/
+
 %start main (* Non terminal  principal *)
 %type <SourceAst.main> main
 

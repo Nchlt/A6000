@@ -37,6 +37,8 @@ let flatten_main p =
     | S.Print(e) ->
       let ce, ve = flatten_expression e in
       ce @ [ T.Print(ve) ]
+    | S.Label(l) -> [ T.Label(l) ]
+    | S.Goto(l) -> [ T.Goto(l) ]
     | S.Set(location, expr) -> (
       let ce, ve = flatten_expression expr in
       match location with
@@ -59,9 +61,15 @@ let flatten_main p =
   and flatten_expression : S.expression -> T.instruction list * T.value =
     function
       | Location(Identifier id) -> [], T.Identifier(id)
-      (* | Literal(Literal lit) -> [], T.Literal(lit)
+      | Literal(lit) -> [], T.Literal(lit)
       | Binop(op, expr1, expr2) ->
-        let res = new_tmp() in *)
+        let il_1, v1 = flatten_expression expr1 in
+        let il_2, v2 = flatten_expression expr2 in
+        let tmp_res = new_tmp() in
+        let il = il_1@il_2@[T.Binop(tmp_res, op, v1, v2)] in
+        ( il , T.Identifier(tmp_res) )
+
+
 
       | _                       -> failwith "A completer"
   in

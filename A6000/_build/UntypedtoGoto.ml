@@ -22,6 +22,11 @@ let destructure_main p =
   and destructure_instruction : S.instruction -> T.block = function
     | Print(e) -> [ T.Print(e)  ]
     | While(cond, b) ->
+      (* let test_label = new_label() in
+      let code_label = new_label() in
+      [ T.Goto(test_label)];
+      T.Label(code_label)]@
+      (destructure_block b)@ *)
         let b_while = destructure_block b in
         let l_start = new_label() in
         let l_while = new_label() in
