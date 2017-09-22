@@ -25,7 +25,7 @@ let flatten_main p =
       let tmp = Printf.sprintf "_tmp_%i" !cpt in
       add_symb tmp;
       tmp
-  in
+  in (*test push*)
 
   (* flatten_block: S.block -> T.instruction list *)
   let rec flatten_block = function
@@ -37,9 +37,10 @@ let flatten_main p =
     | S.Print(e) ->
       let ce, ve = flatten_expression e in
       ce @ [ T.Print(ve) ]
-    | S.Set(location, expr) ->
+    | S.Set(location, expr) -> (
       let ce, ve = flatten_expression expr in
-      ce @ [ T.Value(T.Identifier(location), ve) ]
+      match location with
+      Identifier(str) -> ce @ [ T.Value(str, ve) ] )
     | S.CondGoto(cond, l) ->
       let ce, ve = flatten_expression cond in
       ce @ [ T.CondGoto(ve, l) ]
@@ -58,8 +59,9 @@ let flatten_main p =
   and flatten_expression : S.expression -> T.instruction list * T.value =
     function
       | Location(Identifier id) -> [], T.Identifier(id)
-      | Literal(Literal lit) -> [], T.Literal(lit)
-      (* | Binop(op, expr1, expr2) -> *)
+      (* | Literal(Literal lit) -> [], T.Literal(lit)
+      | Binop(op, expr1, expr2) ->
+        let res = new_tmp() in *)
 
       | _                       -> failwith "A completer"
   in

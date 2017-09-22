@@ -35,6 +35,7 @@ let destructure_main p =
         [T.Label(l_end)]
 
     (*
+
         autre manière en utilisant la négation de cond :
 
         l_while
