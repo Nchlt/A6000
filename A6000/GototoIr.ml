@@ -46,7 +46,7 @@ let flatten_main p =
     | S.CondGoto(cond, l) ->
       let ce, ve = flatten_expression cond in
       ce @ [ T.CondGoto(ve, l) ]
-    | _          -> failwith "A completer"
+    | _          -> failwith "A completer GotoIr.ml l49"
 
   (* flatten_expression: S.expression -> T.instruction list -> T.value *)
   (* Appliquée à une expression, [flatten_expression] renvoie une liste
@@ -68,7 +68,7 @@ let flatten_main p =
         let tmp_res = new_tmp() in
         let il = il_1@il_2@[T.Binop(tmp_res, op, v1, v2)] in
         ( il , T.Identifier(tmp_res) )
-      | _                       -> failwith "A completer"
+      | _                       -> failwith "A completer GotoIr.ml l71"
   in
 
   (* label_instruction: T.instruction -> T.label * T.instruction *)

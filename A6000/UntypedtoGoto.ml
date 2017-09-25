@@ -20,13 +20,9 @@ let destructure_main p =
 
   (* destructure_instruction: S.instruction -> T.block *)
   and destructure_instruction : S.instruction -> T.block = function
+    | Set(loc, e) -> [ T.Set(loc, e) ]
     | Print(e) -> [ T.Print(e)  ]
     | While(cond, b) ->
-      (* let test_label = new_label() in
-      let code_label = new_label() in
-      [ T.Goto(test_label)];
-      T.Label(code_label)]@
-      (destructure_block b)@ *)
         let b_while = destructure_block b in
         let l_start = new_label() in
         let l_while = new_label() in
@@ -38,7 +34,13 @@ let destructure_main p =
         b_while@
         [T.Goto(l_start)]@
         [T.Label(l_end)]
-
+        (*
+        Meilleure version :
+        let test_label = new_label() in
+        let code_label = new_label() in
+        [ T.Goto(test_label)];
+        T.Label(code_label)]@
+        (destructure_block b)@ *)
     (*
 
         autre manière en utilisant la négation de cond :
@@ -60,7 +62,7 @@ let destructure_main p =
       [cgt_if]@b_else@[T.Goto(l_end)]@[T.Label(l_then)]
       @b_then@[T.Label(l_end)]
 
-    | _        -> failwith "A completer"
+    | _        -> failwith "A completer UntypedtoGoto.ml l63"
   in
 
   { T.locals = p.S.locals; T.code = destructure_block p.S.code }

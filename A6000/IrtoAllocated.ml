@@ -7,7 +7,7 @@ let allocate_main reg_flag p =
 
   let tbl =
     if reg_flag
-    then failwith "A completer"
+    then failwith "A completer IrtiAllocated.ml l10"
     else
       (* Tout sur la pile *)
       S.Symb_Tbl.mapi (fun id (info: S.identifier_info) ->
@@ -17,7 +17,7 @@ let allocate_main reg_flag p =
       current_offset := !current_offset - 4;
       T.Stack !current_offset
 
-	  | _       -> failwith "A completer"
+	  | _       -> failwith "A completer IrtiAllocated.ml l20"
       ) p.S.locals
   in
 

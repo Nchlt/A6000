@@ -90,5 +90,5 @@ ocamlfind ocamldep -modules SourceParser.ml > SourceParser.ml.depends # cached
 # Target: SourceParser.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:SourceParser.cmo, file:SourceParser.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w -40 -o SourceParser.cmo SourceParser.ml # cached
 # Target: Main.byte, tags: { byte, dont_link_with, extension:byte, file:Main.byte, link, ocaml, program, quiet, traverse }
-ocamlfind ocamlc -linkpkg SourceAst.cmo UntypedAst.cmo GotoAst.cmo IrAst.cmo AllocatedAst.cmo Mips.cmo AllocatedtoMips.cmo GototoIr.cmo IrtoAllocated.cmo PrebuiltParser.cmo PrebuiltLexer.cmo SourceInterpreter.cmo SourceParser.cmo SourceLexer.cmo SourceTypeChecker.cmo SourcetoUntyped.cmo UntypedtoGoto.cmo Main.cmo -o Main.byte
+ocamlfind ocamlc -linkpkg SourceAst.cmo UntypedAst.cmo GotoAst.cmo IrAst.cmo AllocatedAst.cmo Mips.cmo AllocatedtoMips.cmo GototoIr.cmo IrtoAllocated.cmo PrebuiltParser.cmo PrebuiltLexer.cmo SourceInterpreter.cmo SourceParser.cmo SourceLexer.cmo SourceTypeChecker.cmo SourcetoUntyped.cmo UntypedtoGoto.cmo Main.cmo -o Main.byte # cached
 # Compilation successful.

@@ -9,6 +9,10 @@
 	lw $a0, 0($fp)
 	li $v0, 11
 	syscall
+#_main_1
+	li $a0, 42
+	li $v0, 11
+	syscall
 	li $v0, 10
 	syscall
 atoi:
