@@ -1,0 +1,5 @@
+main(integer x) (
+  var integer a;
+  a := 42;
+  print(a);  
+)
