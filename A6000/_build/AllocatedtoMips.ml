@@ -15,6 +15,12 @@ let generate_main p =
     | []       -> nop
     | (l,i)::b -> comment l @@ generate_instr i @@ generate_block b
 
+  (* A utiliser après toutes nos opérations (pas très optimisé ...) *)
+  and store_value r id =
+    match find_alloc id with
+    | Stack o -> sw r o ~$fp
+    | _ -> failwith "Reg pas pris en compte AllocatedtoMips l21"
+
   (* Un appel [load_value r v] génère du code qui place la valeur [v]
      dans le registre [r]. *)
   and load_value r : AllocatedAst.value -> 'a Mips.asm = function
@@ -32,13 +38,23 @@ let generate_main p =
     | Goto(l) -> b l (* branchemet sur l'étiquette en question *)
     | Label(l) -> label l
     | CondGoto(v, l) -> load_value t0 v @@ bnez t0 l
-    | Value(id, value) -> load_value t1 value
-    | Binop(id, op, v1, v2) ->
-    (* failwith "A completer AllocatedtoMips Binop l36" *)
-      (match op with
-       | Lt -> (load_value t0 v1) @@ (load_value t1 v2) @@ (slt t0 t0 t1)
-       | Add -> (load_value t0 v1) @@ (load_value t1 v2) @@ (add t0 t0 t1)
-       | Mult -> (load_value t0 v1) @@ (load_value t1 v2) @@ (mul t0 t0 t1)
+    | Value(id, value) -> load_value t0 value @@ store_value t0 id
+    | Binop(id, op, v1, v2) -> (match op with
+       | Lt ->
+        (load_value t0 v1) @@
+        (load_value t1 v2) @@
+        (slt t0 t0 t1) @@
+        (store_value t0 id)
+       | Add ->
+        (load_value t0 v1) @@
+        (load_value t1 v2) @@
+        (add t0 t0 t1) @@
+        (store_value t0 id)
+       | Mult ->
+        (load_value t0 v1) @@
+        (load_value t1 v2) @@
+        (mul t0 t0 t1) @@
+        (store_value t0 id)
       )
     | Comment(str) -> failwith "A completer AllocatedtoMips Comment l37"
 
