@@ -8,16 +8,29 @@
 %token <string> IDENT
 %token BEGIN END
 %token SEMI
-%token INT
+%token INT BOOL
+%token <int> INTEGER
+%token <bool> TRUE
+%token <bool> FALSE
 %token PRINT
 %token EOF
 %token MAIN
-%token PLUS
-%token MULT
+%token EQ
+%token ADD
+%token LT AND MULT NEQ LE OR SUB MINUS DIV
+(* ajouts  *)
+%token VAR
+%token IF THEN ELSE
+%token WHILE
+%token SET
+
 
 (* Priotités pour résoudre le conflit shift/reduce *)
-/*%nonassoc PLUS
-%nonassoc MULT*/
+%nonassoc LT AND LE OR 
+/*%nonassoc ADD SUB
+%nonassoc MULT DIV*/
+%left ADD SUB
+%left MULT DIV
 
 %start main (* Non terminal  principal *)
 %type <SourceAst.main> main
@@ -35,9 +48,13 @@ main: (* non terminal *)
     {locals = locals; code=is} }
 ;
 
+
 var_decls:
-| (* empty *)                             { Symb_Tbl.empty    }
-(* À compléter *)
+|                         { Symb_Tbl.empty }
+| VAR; t = BOOL; ident = IDENT; SEMI; table = var_decls
+  { let info = {typ=TypBoolean; kind=Local} in (Symb_Tbl.add ident info table) }
+| VAR; t = INT; ident = IDENT; SEMI; table = var_decls
+  { let info = {typ=TypInteger; kind=Local} in (Symb_Tbl.add ident info table) }
 ;
 
 instructions:
@@ -46,17 +63,35 @@ instructions:
 ;
 
 instruction:
-(* On traduit les règles de grammaire { instruction a faire } *)
-| PRINT(*$0*); BEGIN(*$1*); e=expression(*$2*); END (*$3*)  { Print(e)   }
-(*au lieu d'utiliser les $ varaibles comme en yacc ici on fait e =...*)
-(* À compléter *)
+| loc = location; SET; e = expression { Set(loc, e) }
+| PRINT; BEGIN; e=expression; END  { Print(e) }
+| WHILE; e = expression; BEGIN; ins = instructions; END; { While(e, ins) }
+| IF; e = expression; THEN; BEGIN; ins_if = instructions; END;
+  ELSE; BEGIN; ins_else = instructions; END { If(e, ins_if, ins_else) }
+
 ;
 
+(*mettre un type : ici ? *)
+
 expression:
-| loc=location                            { Location(loc)     }
-| e1 = expression; PLUS; e2 = expression { Binop(Add, e1, e2) }
-| e1 = expression; MULT; e2 = expression { Binop(Mult, e1, e2) }
-(* À compléter *)
+| loc=location                            { Location(loc) }
+| e1 = expression; ADD; e2 = expression   { Binop(Add, e1, e2) }
+| e1 = expression; MULT; e2 = expression  { Binop(Mult, e1, e2) }
+| e1 = expression; EQ; e2 = expression    { Binop(Eq, e1, e2) }
+| e1 = expression; LT; e2 = expression    { Binop(Lt, e1, e2) }
+| e1 = expression; LE; e2 = expression    { Binop(Le, e1, e2) }
+| e1 = expression; OR; e2 = expression    { Binop(Or, e1, e2) }
+| e1 = expression; AND; e2 = expression   { Binop(And, e1, e2) }
+| e1 = expression; SUB; e2 = expression   { Binop(Sub, e1, e2) }
+| e1 = expression; NEQ; e2 = expression   { Binop(Neq, e1, e2) }
+| lit = literal                           { Literal(lit) }
+
+;
+
+literal:
+| i=INTEGER { Int i }
+| b = TRUE { Bool true }
+| b = FALSE { Bool false }
 ;
 
 location:

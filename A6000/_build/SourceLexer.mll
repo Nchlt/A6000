@@ -7,8 +7,17 @@
     let h = Hashtbl.create 17 in
     List.iter (fun (s, k) -> Hashtbl.add h s k)
       [	"integer",  INT;
-	"print",    PRINT;
+  "print",    PRINT;
 	"main",     MAIN;
+  "var",      VAR;
+  "boolean",  BOOL;
+  "if",       IF;
+  "then",     THEN;
+  "else",     ELSE;
+  "while",    WHILE;
+  "true",     TRUE(true);
+  "false",    FALSE(false);
+  (* Ajout *)
       ] ;
     fun s ->
       try  Hashtbl.find h s
@@ -31,8 +40,26 @@ rule token = parse
       { END }
   | ";"
       { SEMI }
-  | _
-      { failwith ("Unknown character : " ^ (lexeme lexbuf)) }
+  | "var"
+      { VAR }
+  | "+"
+    { ADD }
+  | "-"
+    { SUB }
+  | "*"
+    { MULT }
+  | "/"
+    { DIV }
+  | ":=" { SET } (* ADD EQ LT AND MULT NEQ LE OR SUB *)
+  | "=" { EQ }
+  | "<" { LT }
+  | "&&" { AND }
+  | "!=" { NEQ }
+  | "<=" { LE }
+  | "||" { OR }
+  | (digit)+ { INTEGER (int_of_string (lexeme lexbuf))}
+  | "true" { TRUE(true) }
+  | "false" { FALSE(false) }
   | eof
       { EOF }
 
