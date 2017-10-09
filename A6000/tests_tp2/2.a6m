@@ -1,0 +1,6 @@
+main (integer x) (
+  var integer i;
+  i := 32;
+  i++;
+  print(i);
+)

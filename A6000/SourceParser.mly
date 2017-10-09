@@ -17,16 +17,16 @@
 %token MAIN
 %token EQ
 %token ADD
-%token LT AND MULT NEQ LE OR SUB MINUS DIV
+%token LT AND MULT NEQ LE OR SUB MINUS DIV INCR
 (* ajouts  *)
 %token VAR
-%token IF THEN ELSE
+%token IF THEN ELSE FOR
 %token WHILE
 %token SET
 
 
 (* Priotités pour résoudre le conflit shift/reduce *)
-%nonassoc LT AND LE OR 
+%nonassoc LT AND LE OR
 /*%nonassoc ADD SUB
 %nonassoc MULT DIV*/
 %left ADD SUB
@@ -55,6 +55,7 @@ var_decls:
   { let info = {typ=TypBoolean; kind=Local} in (Symb_Tbl.add ident info table) }
 | VAR; t = INT; ident = IDENT; SEMI; table = var_decls
   { let info = {typ=TypInteger; kind=Local} in (Symb_Tbl.add ident info table) }
+
 ;
 
 instructions:
@@ -68,6 +69,19 @@ instruction:
 | WHILE; e = expression; BEGIN; ins = instructions; END; { While(e, ins) }
 | IF; e = expression; THEN; BEGIN; ins_if = instructions; END;
   ELSE; BEGIN; ins_else = instructions; END { If(e, ins_if, ins_else) }
+| FOR; BEGIN; loc = location ; SEMI; lit = literal; END; BEGIN;
+ins = instructions; END
+  { let cond = Binop(Lt, Location(loc), Literal(lit) ) in
+    let incr_i = Binop(Add, Location(loc), Literal(Int(1))) in
+    let set = Set(loc, incr_i) in
+    let new_ins = [set] @ ins in
+    While(cond, new_ins)
+  }
+  | loc = location; INCR {
+    let incr = Binop(Add, Location(loc), Literal(Int(1))) in
+    Set(loc, incr)
+  }
+
 
 ;
 

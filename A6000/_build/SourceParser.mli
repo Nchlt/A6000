@@ -19,8 +19,10 @@ type token =
   | LE
   | INTEGER of (int)
   | INT
+  | INCR
   | IF
   | IDENT of (string)
+  | FOR
   | FALSE of (bool)
   | EQ
   | EOF

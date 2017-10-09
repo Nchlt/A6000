@@ -3,7 +3,7 @@ open IrAst
 (* Création du graphe de flot de contrôle, sous la forme d'une table associant
    à chaque étiquette d'un point de programme les étiquettes de ses successeurs.
      [mk_succ: IrAst.block -> (IrAst.label * IrAst.label) Hashtbl.t]
-   
+
    Note à propos des tables [Hashtbl] de Caml :
 
    - un appel [Hashtbl.add tbl k v] ajoute à la table [tbl] une association
@@ -36,7 +36,30 @@ let mk_succ code =
       Hashtbl.add succ lab target_lab;
       (* Puis on itère. *)
       mk_succ code
-    | _ -> (* À compléter *) failwith "Not implemented"
+    (* Pour les cas suivants (Value, Binop, Print, Label, Comment
+     ) le label suivant est celui de l'instruction suivante :*)
+    | (lab, Value(id, v)) :: (next_lab, _) :: code ->
+      Hashtbl.add succ lab next_lab;
+      mk_succ code
+    | (lab, Binop(id, binop, v1, v2)) :: (next_lab, _) :: code ->
+      Hashtbl.add succ lab next_lab;
+      mk_succ code
+    | (lab, Print(v)) :: (next_lab, _) :: code ->
+      Hashtbl.add succ lab next_lab;
+      mk_succ code
+    | (lab, Label(l)) :: (next_lab, _) :: code ->
+      Hashtbl.add succ lab next_lab;
+      mk_succ code
+    | (lab, Comment(s)) :: (next_lab, _) :: code ->
+      Hashtbl.add succ lab next_lab;
+      mk_succ code
+    (* Il reste CondGoto qui a deux successeurs. le label de l'instruction
+    suivante ainsi que celle du saut conditionnel *)
+    | (lab, CondGoto(val, target_lab)) :: (next_lab) :: code ->
+      Hashtbl.add succ lab target_lab;
+      Hashtbl.add succ lab next_lab;
+      mk_succ code
+    | _ -> failwith "IrLiveness l57"
   in
   mk_succ code;
   (* À la fin, on renvoie la table qu'on a remplie *)
@@ -53,7 +76,7 @@ let mk_succ code =
      ensemblistes.
 *)
 module VarSet = Set.Make(String)
-  
+
 (* Fonction principale, renvoie deux tables associant à chaque étiquette d'un
    point de programme l'ensemble des variables vivantes en entrée/en sortie.
      [mk_lv: IrAst.main ->
@@ -83,8 +106,36 @@ let mk_lv p =
        [lv_kill: IrAst.instruction -> VarSet.t]
   *)
   let rec lv_gen : IrAst.instruction -> VarSet.t = function
-    | Print(v) -> (* À compléter *) failwith "Not implemented"
-    | _        -> (* À compléter *) failwith "Not implemented"
+    | Print(v) ->
+      (match v with
+        | Identifier(id) -> VarSet.singleton id
+        | _ -> VarSet.empty
+      )
+    | Value(id, v) ->
+      (match v with
+        | Identifier(id) -> VarSet.singleton id
+        | _ -> VarSet.empty
+      )
+    | Binop(id, op, v1, v2) ->
+      (match (v1, v2) with
+        | (Identifier(id1), Identifier(id2)) ->
+          let varset_1 = VarSet.singleton id1 in
+          let varset_2 = VarSet.singleton id2 in
+          VarSet.union varset_1 varset_2
+        | (Identifier(id1), _) -> VarSet.singleton id1
+        | (_, Identifier(id2)) -> VarSet.singleton id2
+        | (_, _) -> VarSet.empty
+      )
+    | Label(_) -> VarSet.empty
+    | Goto(_) -> VarSet.empty
+    | CondGoto(v, _) ->
+      (match v with
+        | Indentifier(id) -> VarSet.singleton id
+        | _ -> VarSet.empty
+      )
+    | Comment(_) -> VarSet.empty
+    | _        -> failwith "IrLiveness l137"
+    
   and lv_kill : IrAst.instruction -> VarSet.t = function
     | _        -> (* À compléter *) failwith "Not implemented"
   in

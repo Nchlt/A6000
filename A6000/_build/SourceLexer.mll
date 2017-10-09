@@ -2,6 +2,13 @@
 
   open Lexing
   open SourceParser
+  (* Ref au nombre de ligne *)
+  let line_nb = ref 1;
+
+  exception Erreur_syntaxique of string
+
+  let erreur_syntaxique msg =
+    raise ( Erreur_syntaxique ( msg ^ " ligne : " ^ ( string_of_int !line_nb )))
 
   let id_or_keyword =
     let h = Hashtbl.create 17 in
@@ -17,6 +24,7 @@
   "while",    WHILE;
   "true",     TRUE(true);
   "false",    FALSE(false);
+  "for",      FOR
   (* Ajout *)
       ] ;
     fun s ->
@@ -30,7 +38,9 @@ let alpha = ['a'-'z' 'A'-'Z']
 let ident = ['a'-'z' '_'] (alpha | '_' | '\'' | digit)*
 
 rule token = parse
-  | ['\n' ' ' '\t' '\r']+
+  (*Si on voit un saut de ligne on incrémente line_nb et on lit la suite :*)
+  | '\n' {incr line_nb; token lexbuf} (*Pour l'extension msg d'erreurs*)
+  | [' ' '\t' '\r']+
       { token lexbuf }
   | ident
       { id_or_keyword (lexeme lexbuf) }
@@ -60,6 +70,8 @@ rule token = parse
   | (digit)+ { INTEGER (int_of_string (lexeme lexbuf))}
   | "true" { TRUE(true) }
   | "false" { FALSE(false) }
+  | "++" { INCR }
+  | _ {failwith (erreur_syntaxique "Caratère non reconu")}
   | eof
       { EOF }
 
