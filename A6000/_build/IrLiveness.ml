@@ -180,7 +180,7 @@ let mk_lv p =
     let rec mk_out acc l =
     match l with
     | [] -> acc
-    | (_, lab) :: s ->
+    | lab :: s ->
       let in_lab = Hashtbl.find lv_in lab in
       VarSet.union acc in_lab in
     (* Ce qu'il faut ajouter au lv_out : *)
@@ -194,22 +194,13 @@ let mk_lv p =
     let update old_v add_v =
       let union = VarSet.union old_v add_v in
       let difference = VarSet.diff old_v union in
-      if Set.Make.is_empty difference then (change := false;)
+      if VarSet.is_empty difference then
+      (change := false;)
       else (
         change := true;
         Hashtbl.replace lv_out lab union;
         )
     in
-    (* let update old_v add_v =
-      let union = VarSet.union old_v add_v in
-      let difference = VarSet.diff old_v union in
-        (match difference with
-        | VarSet.empty -> change := false;
-        | _ ->
-          change := true;
-          Hashtbl.replace old_v lab union;)
-     in *)
-
       (* On met à jour *)
       update old_in_lab in_add;
       update old_out_lab add_out;
