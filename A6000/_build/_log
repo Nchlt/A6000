@@ -36,67 +36,13 @@ ocamlfind ocamlc -c -w -40 -o GototoIr.cmo GototoIr.ml # cached
 # Target: IrDeadCodeElim.ml.depends, tags: { extension:ml, file:IrDeadCodeElim.ml, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -modules IrDeadCodeElim.ml > IrDeadCodeElim.ml.depends # cached
 # Target: IrLiveness.ml.depends, tags: { extension:ml, file:IrLiveness.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -modules IrLiveness.ml > IrLiveness.ml.depends # cached
+ocamlfind ocamldep -modules IrLiveness.ml > IrLiveness.ml.depends
 # Target: IrLiveness.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:IrLiveness.cmo, file:IrLiveness.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w -40 -o IrLiveness.cmo IrLiveness.ml # cached
-# Target: IrDeadCodeElim.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:IrDeadCodeElim.cmo, file:IrDeadCodeElim.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w -40 -o IrDeadCodeElim.cmo IrDeadCodeElim.ml # cached
-# Target: IrtoAllocated.ml.depends, tags: { extension:ml, file:IrtoAllocated.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -modules IrtoAllocated.ml > IrtoAllocated.ml.depends # cached
-# Target: IrtoAllocated.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:IrtoAllocated.cmo, file:IrtoAllocated.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w -40 -o IrtoAllocated.cmo IrtoAllocated.ml # cached
-# Target: PrebuiltLexer.ml.depends, tags: { extension:ml, file:PrebuiltLexer.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -modules PrebuiltLexer.ml > PrebuiltLexer.ml.depends # cached
-# Target: PrebuiltParser.mli.depends, tags: { extension:mli, file:PrebuiltParser.mli, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -modules PrebuiltParser.mli > PrebuiltParser.mli.depends # cached
-# Target: PrebuiltParser.cmi, tags: { byte, compile, extension:mli, file:PrebuiltParser.mli, interf, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w -40 -o PrebuiltParser.cmi PrebuiltParser.mli # cached
-# Target: PrebuiltLexer.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:PrebuiltLexer.cmo, file:PrebuiltLexer.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w -40 -o PrebuiltLexer.cmo PrebuiltLexer.ml # cached
-# Target: SourceInterpreter.ml.depends, tags: { extension:ml, file:SourceInterpreter.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -modules SourceInterpreter.ml > SourceInterpreter.ml.depends # cached
-# Target: SourceInterpreter.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:SourceInterpreter.cmo, file:SourceInterpreter.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w -40 -o SourceInterpreter.cmo SourceInterpreter.ml # cached
-# Target: SourceLexer.mll, tags: { extension:mll, file:SourceLexer.mll, lexer, ocaml, ocamllex, quiet, traverse }
-ocamllex.opt -q SourceLexer.mll # cached
-# Target: SourceLexer.ml.depends, tags: { extension:ml, file:SourceLexer.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -modules SourceLexer.ml > SourceLexer.ml.depends # cached
-# Target: SourceParser.mly.depends, tags: { extension:mly, file:SourceParser.mly, infer, menhir_ocamldep, ocaml, ocamldep, quiet, traverse }
-menhir --raw-depend --ocamldep 'ocamlfind ocamldep -modules' SourceParser.mly > SourceParser.mly.depends # cached
-# Target: SourceParser.mly, tags: { byte, compile, extension:ml, extension:mly, file:SourceParser.ml, file:SourceParser.mly, infer, menhir, ocaml, parser, quiet, traverse }
-menhir --ocamlc 'ocamlfind ocamlc -w -40' --infer SourceParser.mly # cached
-# Target: SourceParser.mli.depends, tags: { extension:mli, file:SourceParser.mli, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -modules SourceParser.mli > SourceParser.mli.depends # cached
-# Target: SourceParser.cmi, tags: { byte, compile, extension:mli, file:SourceParser.mli, interf, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w -40 -o SourceParser.cmi SourceParser.mli # cached
-# Target: SourceLexer.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:SourceLexer.cmo, file:SourceLexer.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w -40 -o SourceLexer.cmo SourceLexer.ml # cached
-# Target: SourceTypeChecker.ml.depends, tags: { extension:ml, file:SourceTypeChecker.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -modules SourceTypeChecker.ml > SourceTypeChecker.ml.depends # cached
-# Target: SourceTypeChecker.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:SourceTypeChecker.cmo, file:SourceTypeChecker.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w -40 -o SourceTypeChecker.cmo SourceTypeChecker.ml # cached
-# Target: SourcetoUntyped.ml.depends, tags: { extension:ml, file:SourcetoUntyped.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -modules SourcetoUntyped.ml > SourcetoUntyped.ml.depends # cached
-# Target: SourcetoUntyped.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:SourcetoUntyped.cmo, file:SourcetoUntyped.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w -40 -o SourcetoUntyped.cmo SourcetoUntyped.ml # cached
-# Target: UntypedtoGoto.ml.depends, tags: { extension:ml, file:UntypedtoGoto.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -modules UntypedtoGoto.ml > UntypedtoGoto.ml.depends # cached
-# Target: UntypedtoGoto.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:UntypedtoGoto.cmo, file:UntypedtoGoto.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w -40 -o UntypedtoGoto.cmo UntypedtoGoto.ml # cached
-# Target: Main.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:Main.cmo, file:Main.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w -40 -o Main.cmo Main.ml # cached
-# Target: Mips.ml.depends, tags: { extension:ml, file:Mips.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -modules Mips.ml > Mips.ml.depends # cached
-# Target: Mips.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:Mips.cmo, file:Mips.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w -40 -o Mips.cmo Mips.ml # cached
-# Target: PrebuiltParser.ml.depends, tags: { extension:ml, file:PrebuiltParser.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -modules PrebuiltParser.ml > PrebuiltParser.ml.depends # cached
-# Target: PrebuiltParser.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:PrebuiltParser.cmo, file:PrebuiltParser.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w -40 -o PrebuiltParser.cmo PrebuiltParser.ml # cached
-# Target: SourceParser.ml.depends, tags: { extension:ml, file:SourceParser.ml, ocaml, ocamldep, quiet, traverse }
-ocamlfind ocamldep -modules SourceParser.ml > SourceParser.ml.depends # cached
-# Target: SourceParser.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:SourceParser.cmo, file:SourceParser.ml, implem, ocaml, quiet, traverse }
-ocamlfind ocamlc -c -w -40 -o SourceParser.cmo SourceParser.ml # cached
-# Target: Main.byte, tags: { byte, dont_link_with, extension:byte, file:Main.byte, link, ocaml, program, quiet, traverse }
-ocamlfind ocamlc -linkpkg SourceAst.cmo UntypedAst.cmo GotoAst.cmo IrAst.cmo AllocatedAst.cmo Mips.cmo AllocatedtoMips.cmo GototoIr.cmo IrLiveness.cmo IrDeadCodeElim.cmo IrtoAllocated.cmo PrebuiltParser.cmo PrebuiltLexer.cmo SourceInterpreter.cmo SourceParser.cmo SourceLexer.cmo SourceTypeChecker.cmo SourcetoUntyped.cmo UntypedtoGoto.cmo Main.cmo -o Main.byte
-# Compilation successful.
+ocamlfind ocamlc -c -w -40 -o IrLiveness.cmo IrLiveness.ml
++ ocamlfind ocamlc -c -w -40 -o IrLiveness.cmo IrLiveness.ml
+File "IrLiveness.ml", line 187, characters 38-43:
+Error: This expression has type IrAst.label list
+       but an expression was expected of type ('a * IrAst.label) list
+       Type IrAst.label = string is not compatible with type 'a * IrAst.label 
+Command exited with code 2.
+# Compilation unsuccessful.

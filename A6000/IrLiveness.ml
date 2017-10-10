@@ -161,12 +161,59 @@ let mk_lv p =
   let lv_step_instruction (lab, instr) =
     (* Récupération de la liste des successeurs *)
     let succs = Hashtbl.find_all succ lab in (*List de (le_label, labelSuivant )*)
-    let rec in lab =
-      let out = out lab in
-      let kill = lv_kill instr in
-      let gen = lv_gen instr in
+    (*
+      On récupère le lv_out et lv_in "précédents"
+      (Pas besoin de faire find all car les maj sont faites avec replace)
+     *)
+    let old_out_lab = Hashtbl.find lv_out lab in
+    let old_in_lab = Hashtbl.find lv_in lab in
+    (* Ce qui est généré et tué par l'instruction instr *)
+    let kill_instr = lv_kill instr in
+    let gen_instr = lv_gen instr in
+    (* L'ensemble à ajouter au lv_in cf formule au dessus *)
+    let in_add = VarSet.union (VarSet.diff old_out_lab kill_instr) gen_instr in
+    (*
+      On utilise la fonction suivante pour construire l'ensemble à ajouter
+      à lv_out selon la formule du dessus. Au lieu de passer par une focntion
+      récursive on aurait surement pu utiliser List.fold_left
+    *)
+    let rec mk_out acc l =
+    match l with
+    | [] -> acc
+    | (_, lab) :: s ->
+      let in_lab = Hashtbl.find lv_in lab in
+      VarSet.union acc in_lab in
+    (* Ce qu'il faut ajouter au lv_out : *)
+    let add_out = mk_out VarSet.empty succs in
+    (*
+      Il reste maintenant à mettre à jour. La fonction suivante vérifie
+      si on doit ajouter de nouveaux éléments (à lv_in/out). Si c'est le cas
+      elle modifie change en conséquence.
+    *)
 
-    and out lab =
+    let update old_v add_v =
+      let union = VarSet.union old_v add_v in
+      let difference = VarSet.diff old_v union in
+      if Set.Make.is_empty difference then (change := false;)
+      else (
+        change := true;
+        Hashtbl.replace lv_out lab union;
+        )
+    in
+    (* let update old_v add_v =
+      let union = VarSet.union old_v add_v in
+      let difference = VarSet.diff old_v union in
+        (match difference with
+        | VarSet.empty -> change := false;
+        | _ ->
+          change := true;
+          Hashtbl.replace old_v lab union;)
+     in *)
+
+      (* On met à jour *)
+      update old_in_lab in_add;
+      update old_out_lab add_out;
+
     ()
   in
 
