@@ -33,6 +33,14 @@ ocamlfind ocamlc -c -w -40 -o AllocatedtoMips.cmo AllocatedtoMips.ml # cached
 ocamlfind ocamldep -modules GototoIr.ml > GototoIr.ml.depends # cached
 # Target: GototoIr.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:GototoIr.cmo, file:GototoIr.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w -40 -o GototoIr.cmo GototoIr.ml # cached
+# Target: IrDeadCodeElim.ml.depends, tags: { extension:ml, file:IrDeadCodeElim.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -modules IrDeadCodeElim.ml > IrDeadCodeElim.ml.depends # cached
+# Target: IrLiveness.ml.depends, tags: { extension:ml, file:IrLiveness.ml, ocaml, ocamldep, quiet, traverse }
+ocamlfind ocamldep -modules IrLiveness.ml > IrLiveness.ml.depends # cached
+# Target: IrLiveness.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:IrLiveness.cmo, file:IrLiveness.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w -40 -o IrLiveness.cmo IrLiveness.ml # cached
+# Target: IrDeadCodeElim.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:IrDeadCodeElim.cmo, file:IrDeadCodeElim.ml, implem, ocaml, quiet, traverse }
+ocamlfind ocamlc -c -w -40 -o IrDeadCodeElim.cmo IrDeadCodeElim.ml # cached
 # Target: IrtoAllocated.ml.depends, tags: { extension:ml, file:IrtoAllocated.ml, ocaml, ocamldep, quiet, traverse }
 ocamlfind ocamldep -modules IrtoAllocated.ml > IrtoAllocated.ml.depends # cached
 # Target: IrtoAllocated.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:IrtoAllocated.cmo, file:IrtoAllocated.ml, implem, ocaml, quiet, traverse }
@@ -90,5 +98,5 @@ ocamlfind ocamldep -modules SourceParser.ml > SourceParser.ml.depends # cached
 # Target: SourceParser.cmo, tags: { byte, compile, extension:cmo, extension:ml, file:SourceParser.cmo, file:SourceParser.ml, implem, ocaml, quiet, traverse }
 ocamlfind ocamlc -c -w -40 -o SourceParser.cmo SourceParser.ml # cached
 # Target: Main.byte, tags: { byte, dont_link_with, extension:byte, file:Main.byte, link, ocaml, program, quiet, traverse }
-ocamlfind ocamlc -linkpkg SourceAst.cmo UntypedAst.cmo GotoAst.cmo IrAst.cmo AllocatedAst.cmo Mips.cmo AllocatedtoMips.cmo GototoIr.cmo IrtoAllocated.cmo PrebuiltParser.cmo PrebuiltLexer.cmo SourceInterpreter.cmo SourceParser.cmo SourceLexer.cmo SourceTypeChecker.cmo SourcetoUntyped.cmo UntypedtoGoto.cmo Main.cmo -o Main.byte # cached
+ocamlfind ocamlc -linkpkg SourceAst.cmo UntypedAst.cmo GotoAst.cmo IrAst.cmo AllocatedAst.cmo Mips.cmo AllocatedtoMips.cmo GototoIr.cmo IrLiveness.cmo IrDeadCodeElim.cmo IrtoAllocated.cmo PrebuiltParser.cmo PrebuiltLexer.cmo SourceInterpreter.cmo SourceParser.cmo SourceLexer.cmo SourceTypeChecker.cmo SourcetoUntyped.cmo UntypedtoGoto.cmo Main.cmo -o Main.byte
 # Compilation successful.

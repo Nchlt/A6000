@@ -8,7 +8,7 @@ let reg_allocation = ref false
 let dead_code_elim = ref false
 let prebuilt_frontend = ref false
 let input = ref 0
-  
+
 let spec =
   [ "-r", Arg.Set reg_allocation, "  with register allocation";
     "-dce", Arg.Set dead_code_elim, "  with dead code elimination";
@@ -19,10 +19,10 @@ let spec =
     "-frontend", Arg.Set prebuilt_frontend, "  use prebuilt frontend"
   ]
 
-let file = 
+let file =
   let file = ref None in
-  let set_file s =  
-    if not (Filename.check_suffix s ".a6m") then 
+  let set_file s =
+    if not (Filename.check_suffix s ".a6m") then
       raise (Arg.Bad "no .a6m extension");
     file := Some s
   in
@@ -45,11 +45,11 @@ let () =
     let p = UntypedtoGoto.destructure_main p in
     let p = GototoIr.flatten_main p in
     (* Code à réintégrer à la séance 3 *)
-    (* let p = *)
-    (*   if   !dead_code_elim *)
-    (*   then IrDeadCodeElim.dce p *)
-    (*   else p *)
-    (* in *)
+    let p =
+       if   !dead_code_elim
+      then IrDeadCodeElim.dce p
+      else p
+     in
     let p = IrtoAllocated.allocate_main !reg_allocation p in
     let asm = AllocatedtoMips.generate_main p in
     let output_file = (Filename.chop_suffix file ".a6m") ^ ".asm" in

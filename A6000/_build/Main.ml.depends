@@ -1,1 +1,1 @@
-Main.ml: AllocatedtoMips Arg Filename Format GototoIr IrtoAllocated Lexing Mips PrebuiltLexer PrebuiltParser SourceInterpreter SourceLexer SourceParser SourceTypeChecker SourcetoUntyped UntypedtoGoto
+Main.ml: AllocatedtoMips Arg Filename Format GototoIr IrDeadCodeElim IrtoAllocated Lexing Mips PrebuiltLexer PrebuiltParser SourceInterpreter SourceLexer SourceParser SourceTypeChecker SourcetoUntyped UntypedtoGoto

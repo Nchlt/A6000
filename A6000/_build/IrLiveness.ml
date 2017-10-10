@@ -111,7 +111,7 @@ let mk_lv p =
         | Identifier(id) -> VarSet.singleton id
         | _ -> VarSet.empty
       )
-    | Value(_, v) ->
+    | Value(id, v) ->
       (match v with
         | Identifier(id) -> VarSet.singleton id
         | _ -> VarSet.empty
@@ -138,7 +138,7 @@ let mk_lv p =
     | Value(id, _) -> VarSet.singleton id
     | Binop(id, _, _, _) -> VarSet.singleton id
     | Print(_) | Label(_) | Goto(_) | CondGoto(_,_) | Comment(_) -> VarSet.empty
-    | _        -> failwith "IrLiveness l141"
+    | _        -> (* À compléter *) failwith "IrLiveness l141"
   in
 
   (* Booléen qu'on met à [true] lorsque les tables [lv_in] et [lv_out] sont
@@ -160,13 +160,8 @@ let mk_lv p =
   *)
   let lv_step_instruction (lab, instr) =
     (* Récupération de la liste des successeurs *)
-    let succs = Hashtbl.find_all succ lab in (*List de (le_label, labelSuivant )*)
-    let rec in lab =
-      let out = out lab in
-      let kill = lv_kill instr in
-      let gen = lv_gen instr in
-
-    and out lab =
+    let succs = Hashtbl.find_all succ lab in
+    (* À compléter *)
     ()
   in
 
