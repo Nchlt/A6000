@@ -8,7 +8,7 @@ open IrLiveness
      [dce_step: IrAst.main -> bool * IrAst.main]
  *)
 let dce_step p =
-  
+
   (* Calcul des informations de vivacité *)
   let _, lv_out = mk_lv p in
 
@@ -21,17 +21,24 @@ let dce_step p =
      Toutes les autres sont vivantes.
   *)
   let live_instr = function
-    (* À compléter *)
+    (* Value et Binop affecte des valeurs, on doit verifier si l'id de la
+      valeur qu'on affecte est vivante, c'est à dire si l'id de la variable
+      a une entrée dans lv_out *)
+    | (_, Value(id, _)) | (_, Binop(id, _, _, _)) ->
+      Hashtbl.mem lv_out id
+    (* Les instructions Print Label Goto Comment et CondGoto n'affectent
+    aucune valeur, dans tout les autres cas on renvoie donc true *)
+    (* | Print(_) | Label(_) | Goto(_) | Comment(_) -> true *)
     | _ -> true
   in
-  
+
   (* Filtre la liste pour ne garder que les instructions vivantes *)
   let filtered_code = List.filter live_instr p.code in
   (* Renvoie le booléen et le code simplifié *)
   List.length p.code <> List.length filtered_code, { p with code=filtered_code }
 
-    
+
 (* Élimination itérée *)
 let rec dce p =
-  (* À compléter *)
+  
   p
