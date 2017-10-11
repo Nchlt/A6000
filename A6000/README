@@ -1,25 +1,26 @@
+                    =================================
                         Compilateur langage A6000
                     =================================
                     Nouredine Nour & Malik Kazi-Aoual
 
 
-Ce qui est fait et qui à été testé:
-===================================
+Ce qui est fait et qui à été testé :
+====================================
 TP1
 TP2
   + extension erreur de syntaxe avec ligne
   + extension sucre syntaxique boule for
-  + sucre syntaxique "++" pour incrémenter une valeur.
+  + sucre syntaxique "++" pour incrémenter une valeur
 
-Le dossier tests_tp2 contient des exemples.
-
-Ce qui est fait mais ne fonctionne pas encore comme prévu :
-Sucre syntaxique: boucle for
+(Le dossier tests_tp2 contient des exemples)
 
 
 Ce qui est fait mais pas encore testé :
+=======================================
 TP3
 
 Ce qu'il reste à faire :
+========================
 TP4
+Compléter le sytème de message d'erreurs
 Refactorer certaines parties du code
