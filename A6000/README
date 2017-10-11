@@ -16,9 +16,13 @@ TP2
 (Le dossier tests_tp2 contient des exemples)
 
 
-Ce qui est fait mais pas encore testé :
-=======================================
+Ce qui est fait mais ne fonctionne pas comme prévu :
+===================================================
 TP3
+  Compile sans erreurs.
+  Lorsque l'on lance ./Main.native -dce tests/Circle.a6m on obtient
+  une erreur fatale (failwith ligne 63 IrLiveness). Apparement le
+  patterne matching à un soucis... (en cours d'investigation)
 
 Ce qu'il reste à faire :
 ========================

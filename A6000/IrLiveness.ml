@@ -59,7 +59,8 @@ let mk_succ code =
       Hashtbl.add succ lab target_lab;
       Hashtbl.add succ lab next_lab;
       mk_succ code
-    | _ -> failwith "IrLiveness l57"
+    | [] -> ()
+    | _ -> failwith "IrLiveness l 62"
   in
   mk_succ code;
   (* À la fin, on renvoie la table qu'on a remplie *)
