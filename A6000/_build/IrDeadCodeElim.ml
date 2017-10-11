@@ -40,7 +40,8 @@ let dce_step p =
 
 (* Élimination itérée *)
 let rec dce p =
+  (* Tant qu'on supprime des instructions, on ré-itère sur le code filtré *)
   let has_changed, filt_code = dce_step p in
   if has_changed
-  then dce filt_code else 
+  then dce filt_code else
   p

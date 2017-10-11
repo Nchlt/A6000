@@ -30,7 +30,7 @@ let generate_main p =
         if b then li r 1 else li r 0 )
     | Identifier(id) -> (match find_alloc id with
       | Stack o -> lw r o ~$fp
-  	  | Reg r2 -> failwith "A completer AllocatedtoMips l27")(* move r r2 *)
+  	  | Reg r2 -> move r r2 )
     | _              -> failwith "A completer 28"
 
   and generate_instr : AllocatedAst.instruction -> 'a Mips.asm = function
