@@ -71,6 +71,7 @@ rule token = parse
   | "true" { TRUE(true) }
   | "false" { FALSE(false) }
   | "++" { INCR }
+  | "for" { FOR }
   | _ {failwith (erreur_syntaxique "Caratère non reconu")}
   | eof
       { EOF }

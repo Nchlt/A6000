@@ -69,18 +69,22 @@ instruction:
 | WHILE; e = expression; BEGIN; ins = instructions; END; { While(e, ins) }
 | IF; e = expression; THEN; BEGIN; ins_if = instructions; END;
   ELSE; BEGIN; ins_else = instructions; END { If(e, ins_if, ins_else) }
-| FOR; BEGIN; loc = location ; SEMI; lit = literal; END; BEGIN;
-ins = instructions; END
-  { let cond = Binop(Lt, Location(loc), Literal(lit) ) in
-    let incr_i = Binop(Add, Location(loc), Literal(Int(1))) in
-    let set = Set(loc, incr_i) in
-    let new_ins = [set] @ ins in
+| FOR; BEGIN; cond = expression; SEMI; iter = instructions END;
+  BEGIN; ins = instructions; END
+  {
+    let new_ins = iter @ ins in
     While(cond, new_ins)
+  }
+/*| FOR; BEGIN; cond = expression ; SEMI; iter = expression; END; BEGIN;
+ins = instructions; END
+  { While(cond, ins)
+    (*let new_ins = iter @ ins in
+    While(cond, new_ins)*)
   }
   | loc = location; INCR {
     let incr = Binop(Add, Location(loc), Literal(Int(1))) in
     Set(loc, incr)
-  }
+  }*/
 
 
 ;

@@ -1,6 +1,9 @@
 main (integer x) (
   var integer i;
-  i := 32;
-  i++;
-  print(i);
+
+  for (i < 10; i := i + 1;)(
+    print(33);
+    print(1);
+  );
+
 )
