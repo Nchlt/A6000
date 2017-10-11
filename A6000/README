@@ -1,18 +1,25 @@
-Nouredine Nour & Malik Kazi-Aoual
+                        Compilateur langage A6000
+                    =================================
+                    Nouredine Nour & Malik Kazi-Aoual
 
-Ce qui est fait et qui à été testé : 
+
+Ce qui est fait et qui à été testé:
+===================================
 TP1
-TP2 + implémentation d'un retour avec numéro de ligne pour les erreurs
-de syntaxe.
+TP2
+  + extension erreur de syntaxe avec ligne
+  + extension sucre syntaxique boule for
+  + sucre syntaxique "++" pour incrémenter une valeur.
+
+Le dossier tests_tp2 contient des exemples.
 
 Ce qui est fait mais ne fonctionne pas encore comme prévu :
 Sucre syntaxique: boucle for
 
 
 Ce qui est fait mais pas encore testé :
-TP3 
+TP3
 
 Ce qu'il reste à faire :
-TP4 
-Refactorer certaines parties du code 
-
+TP4
+Refactorer certaines parties du code

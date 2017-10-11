@@ -40,5 +40,7 @@ let dce_step p =
 
 (* Élimination itérée *)
 let rec dce p =
-  
+  let has_changed, filt_code = dce_step p in
+  if has_changed
+  then dce filt_code else 
   p
