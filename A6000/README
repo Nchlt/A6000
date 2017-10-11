@@ -1,5 +1,5 @@
                     =================================
-                        Compilateur langage A6000
+                    |    Compilateur langage A6000  |
                     =================================
                     Nouredine Nour & Malik Kazi-Aoual
 
@@ -20,19 +20,22 @@ Ce qui est fait mais ne fonctionne pas comme prévu :
 ===================================================
 TP3
   Compile sans erreurs.
-  Lorsque l'on lance ./Main.native -dce tests/Circle.a6m on obtient
+  Mais lorsqu'on lance ./Main.native -dce tests/Circle.a6m on obtient
   une erreur fatale (failwith ligne 63 IrLiveness). Apparement le
-  patterne matching à un soucis... (en cours d'investigation)
+  pattern matching à un soucis... (en cours d'investigation)
+
+La première partie du TP4.
 
 Ce qu'il reste à faire :
 ========================
-Le TP4
+Finir le TP4
 
 Compléter les règles de priorité des opérateurs car
 même si l'exemple Circle.a6m fonctionne menhir affiche
 encore des conflits.
 
-Compléter le sytème de message d'erreurs.
+Compléter le sytème de message d'erreurs, pour l'instant seuls les caractères
+non reconnus sont dététés.
 
 Refactorer certaines parties du code (match paterns innutiles
 ou pouvant être regroupé...)
