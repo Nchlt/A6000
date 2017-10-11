@@ -4,18 +4,41 @@
 	lw $a0, 0($a1)
 	jal atoi
 	sw $v0, 0($fp)
-	addi $sp, $sp, -8
-#_main_0
-	li $t0, 10
-	sw $t0, -8($fp)
+	addi $sp, $sp, -12
+#_label_main_1
+_label_main_1:
 #_main_1
+	lw $t0, -12($fp)
+	li $t1, 10
+	slt $t0, $t0, $t1
+	sw $t0, -8($fp)
+#_main_2
 	lw $t0, -8($fp)
+	bnez $t0, _label_main_2
+#_main_3
+	b _label_main_3
+#_label_main_2
+_label_main_2:
+#_main_5
+	lw $t0, -12($fp)
 	li $t1, 1
 	add $t0, $t0, $t1
 	sw $t0, -4($fp)
-#_main_2
+#_main_6
 	lw $t0, -4($fp)
-	sw $t0, -8($fp)
+	sw $t0, -12($fp)
+#_main_7
+	li $a0, 33
+	li $v0, 11
+	syscall
+#_main_8
+	li $a0, 1
+	li $v0, 11
+	syscall
+#_main_9
+	b _label_main_1
+#_label_main_3
+_label_main_3:
 	li $v0, 10
 	syscall
 atoi:

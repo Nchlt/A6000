@@ -6,16 +6,24 @@
 	sw $v0, 0($fp)
 	addi $sp, $sp, -8
 #_main_0
-	li $t0, 10
+	li $t0, 37
 	sw $t0, -8($fp)
 #_main_1
+	lw $a0, -8($fp)
+	li $v0, 11
+	syscall
+#_main_2
 	lw $t0, -8($fp)
 	li $t1, 1
 	add $t0, $t0, $t1
 	sw $t0, -4($fp)
-#_main_2
+#_main_3
 	lw $t0, -4($fp)
 	sw $t0, -8($fp)
+#_main_4
+	lw $a0, -8($fp)
+	li $v0, 11
+	syscall
 	li $v0, 10
 	syscall
 atoi:

@@ -75,6 +75,12 @@ instruction:
     let new_ins = iter @ ins in
     While(cond, new_ins)
   }
+ | loc = location; INCR
+    {
+     let e = Binop(Add, Location(loc), Literal(Int(1))) in
+     Set(loc, e)
+
+   }
 /*| FOR; BEGIN; cond = expression ; SEMI; iter = expression; END; BEGIN;
 ins = instructions; END
   { While(cond, ins)
