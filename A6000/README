@@ -21,6 +21,13 @@ TP3
 
 Ce qu'il reste à faire :
 ========================
-TP4
-Compléter le sytème de message d'erreurs
-Refactorer certaines parties du code
+Le TP4
+
+Compléter les règles de priorité des opérateurs car
+même si l'exemple Circle.a6m fonctionne menhir affiche
+encore des conflits.
+
+Compléter le sytème de message d'erreurs.
+
+Refactorer certaines parties du code (match paterns innutiles
+ou pouvant être regroupé...)
