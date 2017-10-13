@@ -14,7 +14,7 @@ let flatten_main p =
   let add_symb s =
     symb_tbl := T.Symb_Tbl.add s (Local: T.identifier_info) !symb_tbl;
   in
-
+  
   (* new_tmp: unit -> string *)
   (* Un appel [new_tmp()] crée un nouvel identifiant de registre virtuel
      et l'ajoute à la table des symboles. *)
@@ -25,28 +25,32 @@ let flatten_main p =
       let tmp = Printf.sprintf "_tmp_%i" !cpt in
       add_symb tmp;
       tmp
-  in (*test push*)
+  in
 
   (* flatten_block: S.block -> T.instruction list *)
   let rec flatten_block = function
     | []   -> []
     | i::b -> flatten_instruction i @ (flatten_block b)
-
+      
   (* flatten_instruction: S.instruction -> T.instruction list *)
   and flatten_instruction = function
+    | S.Set(Identifier id, e) ->
+      let ce, ve = flatten_expression e in
+      ce @ [ T.Value(id, ve) ]
+    
     | S.Print(e) ->
       let ce, ve = flatten_expression e in
       ce @ [ T.Print(ve) ]
-    | S.Label(l) -> [ T.Label(l) ]
-    | S.Goto(l) -> [ T.Goto(l) ]
-    | S.Set(location, expr) -> (
-      let ce, ve = flatten_expression expr in
-      match location with
-      Identifier(str) -> ce @ [ T.Value(str, ve) ] )
-    | S.CondGoto(cond, l) ->
-      let ce, ve = flatten_expression cond in
+	
+    | S.Label l -> [ T.Label l ]
+    
+    | S.Goto l  -> [ T.Goto l ]
+    
+    | S.CondGoto(e, l) ->
+      let ce, ve = flatten_expression e in
       ce @ [ T.CondGoto(ve, l) ]
-    | _          -> failwith "A completer GotoIr.ml l49"
+	
+    | S.Comment(s) -> [ T.Comment(s) ]
 
   (* flatten_expression: S.expression -> T.instruction list -> T.value *)
   (* Appliquée à une expression, [flatten_expression] renvoie une liste
@@ -60,15 +64,14 @@ let flatten_main p =
   *)
   and flatten_expression : S.expression -> T.instruction list * T.value =
     function
-      | Location(Identifier id) -> [], T.Identifier(id)
       | Literal(lit) -> [], T.Literal(lit)
-      | Binop(op, expr1, expr2) ->
-        let il_1, v1 = flatten_expression expr1 in
-        let il_2, v2 = flatten_expression expr2 in
-        let tmp_res = new_tmp() in
-        let il = il_1@il_2@[T.Binop(tmp_res, op, v1, v2)] in
-        ( il , T.Identifier(tmp_res) )
-      | _                       -> failwith "A completer GotoIr.ml l71"
+      | Location(Identifier id) -> [], T.Identifier(id)
+      | Binop(op, e1, e2) ->
+	let ce1, ve1 = flatten_expression e1 in
+	let ce2, ve2 = flatten_expression e2 in
+	let res = new_tmp() in
+	ce1 @ ce2 @ [ T.Binop(res, op, ve1, ve2) ], T.Identifier res
+
   in
 
   (* label_instruction: T.instruction -> T.label * T.instruction *)
@@ -88,3 +91,4 @@ let flatten_main p =
 
   let flattened_code = flatten_block p.S.code in
   { T.locals = !symb_tbl; T.code = List.map label_instruction flattened_code }
+  

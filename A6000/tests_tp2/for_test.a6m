@@ -1,9 +1,0 @@
-main (integer x) (
-  var integer i;
-
-  for (i < 10; i++;)(
-    print(33);
-    print(1);
-  );
-
-)

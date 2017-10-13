@@ -3,7 +3,7 @@ open IrAst
 (* Création du graphe de flot de contrôle, sous la forme d'une table associant
    à chaque étiquette d'un point de programme les étiquettes de ses successeurs.
      [mk_succ: IrAst.block -> (IrAst.label * IrAst.label) Hashtbl.t]
-
+   
    Note à propos des tables [Hashtbl] de Caml :
 
    - un appel [Hashtbl.add tbl k v] ajoute à la table [tbl] une association
@@ -22,48 +22,42 @@ open IrAst
      entre la clé [k] et la valeur [v], en effaçant une éventuelle association
      précédente
 *)
-
+  
 let mk_succ code =
   (* Création avec une capacité arbitraire ; la table sera étendue au besoin *)
   let succ = Hashtbl.create 257 in
 
   (* Parcours du code du programme et remplissage à la volée de la table *)
-  let rec mk_succ : IrAst.block -> unit = function
-    (* Cas offert : instruction [Goto] *)
+  let rec mk_succ = function
     | (lab, Goto(target_lab)) :: code ->
       (* Le seul successeur d'une instruction [Goto] est l'instruction désignée
 	 par l'étiquette de saut. *)
       Hashtbl.add succ lab target_lab;
       (* Puis on itère. *)
       mk_succ code
-    (* Pour les cas suivants (Value, Binop, Print, Label, Comment
-     ) le label suivant est celui de l'instruction suivante :*)
-    | (lab, Value(_, _)) :: (next_lab, _) :: code ->
-      Hashtbl.add succ lab next_lab;
-      mk_succ code
-    | (lab, Binop(_, _, _, _)) :: (next_lab, _) :: code ->
-      Hashtbl.add succ lab next_lab;
-      mk_succ code
-    | (lab, Print(_)) :: (next_lab, _) :: code ->
-      Hashtbl.add succ lab next_lab;
-      mk_succ code
-    | (lab, Label(_)) :: (next_lab, _) :: code ->
-      Hashtbl.add succ lab next_lab;
-      mk_succ code
-    | (lab, Comment(_)) :: (next_lab, _) :: code ->
-      Hashtbl.add succ lab next_lab;
-      mk_succ code
-    (* Il reste CondGoto qui a deux successeurs. le label de l'instruction
-    suivante ainsi que celle du saut conditionnel *)
-    | (lab, CondGoto(_, target_lab)) :: (next_lab, _) :: code ->
-      Hashtbl.add succ lab target_lab;
-      Hashtbl.add succ lab next_lab;
-      mk_succ code
+
+    (* Dans les autres cas, il faut tenir compte de l'étiquette du successeur
+       immédiat (en tête de la liste [code]), si ce successeur existe.
+       On définit une fonction auxiliaire [add_next] pour cela.
+    *)
+    | (lab, CondGoto(_, target_lab)) :: code ->
+      Hashtbl.add succ lab target_lab; add_next lab code; mk_succ code
+    | (lab, _) :: code ->
+      add_next lab code; mk_succ code
+
+    (* Dans le cas d'une liste d'instructions vide ne rien faire (c'est la
+       fin de l'itération) *)
     | [] -> ()
-    | _ -> failwith "IrLiveness l 62"
+
+  (* Fonction auxiliaire : [add_next lab code] ajoute dans les successeurs de
+     [lab] l'étiquette de la première instruction de [code] si celle-ci existe.
+     Ne fait rien sinon. *)
+  and add_next lab = function
+    | []                 -> ()
+    | (next_lab, _) :: _ -> Hashtbl.add succ lab next_lab
+      
   in
   mk_succ code;
-  (* À la fin, on renvoie la table qu'on a remplie *)
   succ
 
 
@@ -78,13 +72,7 @@ let mk_succ code =
 *)
 module VarSet = Set.Make(String)
 
-(* Fonction principale, renvoie deux tables associant à chaque étiquette d'un
-   point de programme l'ensemble des variables vivantes en entrée/en sortie.
-     [mk_lv: IrAst.main ->
-      ((IrAst.label, VarSet.t) Hashtbl.t) * ((IrAst.label, VarSet.t) Hashtbl.t)]
-*)
 let mk_lv p =
-
   (* Création des deux tables destinées à accumuler le résultat, et
      calcul du flot de contrôle. *)
   let code = p.code in
@@ -99,6 +87,7 @@ let mk_lv p =
     Hashtbl.add lv_in  lab VarSet.empty;
     Hashtbl.add lv_out lab VarSet.empty
   ) code;
+  
 
   (* Les fonctions [lv_gen] et [lv_kill] prennent en paramètre une instruction
      et indiquent respectivement l'ensemble des variables vivantes qu'elle
@@ -106,49 +95,37 @@ let mk_lv p =
        [lv_gen:  IrAst.instruction -> VarSet.t]
        [lv_kill: IrAst.instruction -> VarSet.t]
   *)
-  let rec lv_gen : IrAst.instruction -> VarSet.t = function
-    | Print(v) ->
-      (match v with
-        | Identifier(id) -> VarSet.singleton id
-        | _ -> VarSet.empty
-      )
-    | Value(_, v) ->
-      (match v with
-        | Identifier(id) -> VarSet.singleton id
-        | _ -> VarSet.empty
-      )
-    | Binop(id, op, v1, v2) ->
-      (match (v1, v2) with
-        | (Identifier(id1), Identifier(id2)) ->
-          let varset_1 = VarSet.singleton id1 in
-          let varset_2 = VarSet.singleton id2 in
-          VarSet.union varset_1 varset_2
-        | (Identifier(id1), _) -> VarSet.singleton id1
-        | (_, Identifier(id2)) -> VarSet.singleton id2
-        | (_, _) -> VarSet.empty
-      )
-    | CondGoto(v, _) ->
-      (match v with
-        | Identifier(id) -> VarSet.singleton id
-        | _ -> VarSet.empty
-      )
-    | Label(_) | Goto(_) | Comment(_) -> VarSet.empty
-    | _        -> failwith "IrLiveness l135"
-
-  and lv_kill : IrAst.instruction -> VarSet.t = function
-    | Value(id, _) -> VarSet.singleton id
+  (* On introduit une fonction auxiliaire [var_use: IrAst.value -> VarSet.t]
+     qui renvoie l'ensemble vide ou un singleton selon que la valeur passée
+     en argument est un litéral ou un singleton. *)
+  let rec var_use = function
+    | Literal _     -> VarSet.empty
+    | Identifier id -> VarSet.singleton id
+  and lv_gen = function
+    (* Une instruction utilisant une seule valeur appelle [var_use] *)
+    | Value(_, v)
+    | Print(v)
+    | CondGoto(v, _)      -> var_use v
+    (* Une instruction utilisant deux valeurs fait l'union des [var_use] *)
+    | Binop(_, _, v1, v2) -> VarSet.union (var_use v1) (var_use v2)
+    (* Une instruction n'utilisant pas de valeur de produit rien *)
+    | _                   -> VarSet.empty
+  and lv_kill = function
+    (* Une instruction modifiant un identifiant tue ce seul identifiant *)
+    | Value(id, _)
     | Binop(id, _, _, _) -> VarSet.singleton id
-    | Print(_) | Label(_) | Goto(_) | CondGoto(_,_) | Comment(_) -> VarSet.empty
-    | _        -> failwith "IrLiveness l141"
+    (* Sinon, ne tue rien *)
+    | _                  -> VarSet.empty
   in
 
+      
   (* Booléen qu'on met à [true] lorsque les tables [lv_in] et [lv_out] sont
      encore en train de changer. Il est initialisé à [true] car à l'origine il
      y a bien du calcul à faire, mais il sera repassé à [false] avant chaque
      itération, pour n'être remis à [true] que si des changements sont
      observés. *)
   let change = ref true in
-
+  
   (* Un appel [lv_step_instruction (lab, instr)] met à jour les entrées pour
      le point de programme [lab] (comportant l'instruction [instr]) dans les
      tables [lv_in] et [lv_out], en appliquant les équations de flot de données.
@@ -159,59 +136,31 @@ let mk_lv p =
      Cette fonction doit aussi faire passer le booléen [change] à [true] si
      les valeurs In[lab] et Out[lab] ont été modifiées.
   *)
-  let lv_step_instruction (lab, instr) =
+  let lv_step_instr (lab, instr) =
     (* Récupération de la liste des successeurs *)
-    let succs = Hashtbl.find_all succ lab in (*List de (le_label, labelSuivant )*)
-    (*
-      On récupère le lv_out et lv_in "précédents"
-      (Pas besoin de faire find all car les maj sont faites avec replace)
-     *)
-    let old_out_lab = Hashtbl.find lv_out lab in
-    let old_in_lab = Hashtbl.find lv_in lab in
-    (* Ce qui est généré et tué par l'instruction instr *)
-    let kill_instr = lv_kill instr in
-    let gen_instr = lv_gen instr in
-    (* L'ensemble à ajouter au lv_in cf formule au dessus *)
-    let in_add = VarSet.union (VarSet.diff old_out_lab kill_instr) gen_instr in
-    (*
-      On utilise la fonction suivante pour construire l'ensemble à ajouter
-      à lv_out selon la formule du dessus. Au lieu de passer par une focntion
-      récursive on aurait surement pu utiliser List.fold_left
-    *)
-    let rec mk_out acc l =
-    match l with
-    | [] -> acc
-    | lab :: s ->
-      let in_lab = Hashtbl.find lv_in lab in
-      VarSet.union acc in_lab in
-    (* Ce qu'il faut ajouter au lv_out : *)
-    let add_out = mk_out VarSet.empty succs in
-    (*
-      Il reste maintenant à mettre à jour. La fonction suivante vérifie
-      si on doit ajouter de nouveaux éléments (à lv_in/out). Si c'est le cas
-      elle modifie change en conséquence.
-    *)
-
-    let update old_v add_v =
-      let union = VarSet.union old_v add_v in
-      let difference = VarSet.diff old_v union in
-      if VarSet.is_empty difference then
-      (change := false;)
-      else (
-        change := true;
-        Hashtbl.replace lv_out lab union;
-        )
+    let succs = Hashtbl.find_all succ lab in
+    (* Calcul de [lv_out] par union des [lv_in] des successeurs *)
+    let new_lv_out = List.fold_left (fun new_lv_out succ_lab ->
+      VarSet.union new_lv_out (Hashtbl.find lv_in succ_lab)
+    ) VarSet.empty succs
     in
-      (* On met à jour *)
-      update old_in_lab in_add;
-      update old_out_lab add_out;
-
-    ()
+    (* Mémorisation de l'ancien [lv_in] *)
+    let old_lv_in = Hashtbl.find lv_in lab in
+    (* Calcul du nouveau [lv_in] en fonction du nouveau [lv_out] *)
+    let new_lv_in =
+      VarSet.union (VarSet.diff new_lv_out (lv_kill instr)) (lv_gen instr)
+    in
+    (* Mise à jour de la table *)
+    Hashtbl.replace lv_out lab new_lv_out;
+    Hashtbl.replace lv_in  lab new_lv_in;
+    (* Si [lv_in] a changé, alors faire passer le booléen [change] à vrai *)
+    if old_lv_in <> new_lv_in
+    then change := true
   in
 
   (* Une passe complète : met à jour une fois chaque instruction *)
   let lv_step_main () =
-    List.iter lv_step_instruction code
+    List.iter lv_step_instr code
   in
   (* Répéter tant qu'il reste des changements *)
   while !change do

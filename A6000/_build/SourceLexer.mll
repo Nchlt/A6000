@@ -2,30 +2,21 @@
 
   open Lexing
   open SourceParser
-  (* Ref au nombre de ligne *)
-  let line_nb = ref 1;
-
-  exception Erreur_syntaxique of string
-
-  let erreur_syntaxique msg =
-    raise ( Erreur_syntaxique ( msg ^ " ligne : " ^ ( string_of_int !line_nb )))
 
   let id_or_keyword =
     let h = Hashtbl.create 17 in
     List.iter (fun (s, k) -> Hashtbl.add h s k)
-      [	"integer",  INT;
-  "print",    PRINT;
+      [ "true",     CONST_BOOL(true);
+	"false",    CONST_BOOL(false);
+	"while",    WHILE;
+	"if",       IF;
+	"then",     THEN;
+	"else",     ELSE;
+	"integer",  INT;
+	"boolean",  BOOL;
+	"print",    PRINT;
 	"main",     MAIN;
-  "var",      VAR;
-  "boolean",  BOOL;
-  "if",       IF;
-  "then",     THEN;
-  "else",     ELSE;
-  "while",    WHILE;
-  "true",     TRUE(true);
-  "false",    FALSE(false);
-  "for",      FOR
-  (* Ajout *)
+	"var",      VAR;
       ] ;
     fun s ->
       try  Hashtbl.find h s
@@ -38,10 +29,12 @@ let alpha = ['a'-'z' 'A'-'Z']
 let ident = ['a'-'z' '_'] (alpha | '_' | '\'' | digit)*
 
 rule token = parse
-  (*Si on voit un saut de ligne on incrémente line_nb et on lit la suite :*)
-  | '\n' {incr line_nb; token lexbuf} (*Pour l'extension msg d'erreurs*)
-  | [' ' '\t' '\r']+
+  | ['\n' ' ' '\t' '\r']+
       { token lexbuf }
+  | "(*"
+      { comment lexbuf; token lexbuf }
+  | digit+
+      { CONST_INT (int_of_string (lexeme lexbuf)) }
   | ident
       { id_or_keyword (lexeme lexbuf) }
   | "("
@@ -50,29 +43,28 @@ rule token = parse
       { END }
   | ";"
       { SEMI }
-  | "var"
-      { VAR }
+  | ":="
+      { SET }
   | "+"
-    { ADD }
+      { PLUS }
   | "-"
-    { SUB }
+      { MINUS }
   | "*"
-    { MULT }
-  | "/"
-    { DIV }
-  | ":=" { SET } (* ADD EQ LT AND MULT NEQ LE OR SUB *)
-  | "=" { EQ }
-  | "<" { LT }
-  | "&&" { AND }
-  | "!=" { NEQ }
-  | "<=" { LE }
-  | "||" { OR }
-  | (digit)+ { INTEGER (int_of_string (lexeme lexbuf))}
-  | "true" { TRUE(true) }
-  | "false" { FALSE(false) }
-  | "++" { INCR }
-  | "for" { FOR }
-  | _ {failwith (erreur_syntaxique "Caratère non reconu")}
+      { STAR }
+  | "=="
+      { EQUAL }
+  | "!="
+      { NEQ }
+  | "<"
+      { LT }
+  | "<="
+      { LE }
+  | "&&"
+      { AND }
+  | "||"
+      { OR }
+  | _
+      { failwith ("Unknown character : " ^ (lexeme lexbuf)) }
   | eof
       { EOF }
 

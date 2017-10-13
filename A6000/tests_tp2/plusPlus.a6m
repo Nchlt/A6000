@@ -1,9 +1,0 @@
-main(integer x)(
-  var integer i;
-
-  i := 37;
-  print(i);
-  i++;
-  print(i);
-
-)

@@ -39,7 +39,7 @@ and literal =
 
 and location =
   | Identifier of string (* Variable en mémoire *)
-
+      
 and binop =
   | Add (* +  *) | Mult (* *  *) | Sub (* - *)
   | Eq  (* == *) | Neq  (* != *)
@@ -51,7 +51,7 @@ and binop =
    [print_main m] produit une chaîne de caractère représentant le programme
 *)
 open Printf
-
+      
 let print_typ = function
   | TypInteger -> "integer"
   | TypBoolean -> "boolean"

@@ -4,35 +4,30 @@
 type token = 
   | WHILE
   | VAR
-  | TRUE of (bool)
   | THEN
-  | SUB
+  | STAR
   | SET
   | SEMI
   | PRINT
+  | PLUS
   | OR
   | NEQ
-  | MULT
   | MINUS
   | MAIN
   | LT
   | LE
-  | INTEGER of (int)
   | INT
-  | INCR
   | IF
   | IDENT of (string)
-  | FOR
-  | FALSE of (bool)
-  | EQ
+  | EQUAL
   | EOF
   | END
   | ELSE
-  | DIV
+  | CONST_INT of (int)
+  | CONST_BOOL of (bool)
   | BOOL
   | BEGIN
   | AND
-  | ADD
 
 (* This exception is raised by the monolithic API functions. *)
 

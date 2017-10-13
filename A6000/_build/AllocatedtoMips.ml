@@ -4,61 +4,80 @@ open Mips
 let generate_main p =
 
   (* Affecte des emplacements mémoire aux variables locales. *)
-  let sp_off   = p.offset in
+  let sp_off = p.offset in
   let symb_tbl = p.locals in
   let find_alloc id =
     try  AllocatedAst.Symb_Tbl.find id symb_tbl
     with Not_found -> failwith (Printf.sprintf "Node %s not found" id)
   in
-
+  
   let rec generate_block = function
-    | []       -> nop
+    | []       -> Nop
     | (l,i)::b -> comment l @@ generate_instr i @@ generate_block b
 
-  (* A utiliser après toutes nos opérations (pas très optimisé ...) *)
-  and store_value r id =
-    match find_alloc id with
-    | Stack o -> sw r o ~$fp
-    | _ -> failwith "Reg pas pris en compte AllocatedtoMips l21"
+  (* Un appel [load_literal r v] génère du code qui place la valeur
+     immédiate [v] dans le registre [r]. *)
+  and load_literal r : AllocatedAst.literal -> 'a Mips.asm = function
+    | Int(i)  -> li r i
+    | Bool(b) -> let i = if b then -1 else 0 in li r i
 
   (* Un appel [load_value r v] génère du code qui place la valeur [v]
      dans le registre [r]. *)
   and load_value r : AllocatedAst.value -> 'a Mips.asm = function
-    | Literal(lit) -> (match lit with
-      | Int(i) -> li r i
-      | Bool(b) ->
-        if b then li r 1 else li r 0 )
+    | Literal(lit)   -> load_literal r lit
     | Identifier(id) -> (match find_alloc id with
-      | Stack o -> lw r o ~$fp
-  	  | Reg r2 -> move r r2 )
-    | _              -> failwith "A completer 28"
+	| Reg r'  -> move r r'
+	| Stack o -> lw r o ~$fp)
+
+  (* Variante optimisée de [load_value], qui place la valeur dans le
+     registre [r] sauf si cette valeur est déjà stockée dans un
+     registre [r'].
+     Renvoie le code généré et le registre de destination effectif. *)
+  and load_operand r : AllocatedAst.value -> Mips.register * 'a Mips.asm =
+    function
+      | Literal(lit)   -> r, load_literal r lit
+      | Identifier(id) ->
+	(match find_alloc id with
+	  | Reg r'  -> r', Nop
+	  | Stack o -> r, lw r o ~$fp
+	)
+  (* Spécialisations pour les premier et second opérandes d'une opération. *)
+  and load_first_operand v  = load_operand ~$t0 v
+  and load_second_operand v = load_operand ~$t1 v
 
   and generate_instr : AllocatedAst.instruction -> 'a Mips.asm = function
-    | Print(v) -> load_value ~$a0 v @@ li ~$v0 11 @@ syscall
-    | Goto(l) -> b l (* branchemet sur l'étiquette en question *)
-    | Label(l) -> label l
-    | CondGoto(v, l) -> load_value t0 v @@ bnez t0 l
-    | Value(id, value) -> load_value t0 value @@ store_value t0 id
-    | Binop(id, op, v1, v2) -> (match op with
-       | Lt ->
-        (load_value t0 v1) @@
-        (load_value t1 v2) @@
-        (slt t0 t0 t1) @@
-        (store_value t0 id)
-       | Add ->
-        (load_value t0 v1) @@
-        (load_value t1 v2) @@
-        (add t0 t0 t1) @@
-        (store_value t0 id)
-       | Mult ->
-        (load_value t0 v1) @@
-        (load_value t1 v2) @@
-        (mul t0 t0 t1) @@
-        (store_value t0 id)
+    | Value(dest, v) ->
+      (match find_alloc dest with
+	| Reg r   -> load_value r v
+	| Stack o -> let r, a = load_first_operand v in
+		     a @@ sw r o ~$fp
       )
-    | Comment(str) -> failwith "A completer AllocatedtoMips Comment l37"
 
-    | _        -> failwith "A completer AllocatedtoMips l36"
+    | Binop(dest, op, o1, o2) ->
+      let op = match op with
+	| Add  -> add
+	| Mult -> mul
+	| Sub  -> sub
+	| Eq   -> seq
+	| Neq  -> sne
+	| Lt   -> slt
+	| Le   -> sle
+	| And  -> and_
+	| Or   -> or_
+      in
+      let (r1, a1) = load_first_operand o1 in
+      let (r2, a2) = load_second_operand o2 in
+      let aop = match find_alloc dest with
+	| Reg r   -> op r r1 r2
+	| Stack o -> op ~$t0 r1 r2 @@ sw ~$t0 o ~$fp
+      in
+      a1 @@ a2 @@ aop
+
+    | Print(v)        -> load_value ~$a0 v @@ li ~$v0 11 @@ syscall
+    | Label(lab)      -> label lab
+    | Goto(lab)       -> b lab
+    | CondGoto(v,lab) -> load_value ~$t0 v @@ bnez ~$t0 lab
+    | Comment(s)      -> comment s
   in
 
   let init =
@@ -71,7 +90,7 @@ let generate_main p =
   in
 
   let close = li v0 10 @@ syscall in
-
+  
   let built_ins =
     label "atoi"
     @@ move t0 a0
@@ -96,6 +115,6 @@ let generate_main p =
     @@ move v0 t1
     @@ jr   ra
   in
-
+  
   let asm = generate_block p.code in
-  { text = init @@ asm @@ close @@ built_ins; data = nop }
+  { text = init @@ asm @@ close @@ built_ins; data = Nop }
