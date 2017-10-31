@@ -13,7 +13,7 @@
 %token BEGIN END
 %token IF THEN ELSE
 %token WHILE
-%token SEMI
+%token SEMI COMMA
 %token SET
 %token VAR
 %token INT BOOL
@@ -30,6 +30,19 @@
 %type <SourceAst.main> main
 
 %%
+
+prog:
+|  fun_decls; EOF  {
+    let infox = { typ=TypInteger; kind=FormalX } in
+    let init  = Symb_Tbl.singleton x infox in
+    let merge_vars _ v1 v2 = match v1, v2 with
+      | _, Some(v) -> Some v
+      | Some(v), _ -> Some v
+      | _, _       -> None
+    in
+    let locals = Symb_Tbl.merge merge_vars init vds in
+    {locals = locals; code=is} }
+;
 
 main:
 | MAIN; BEGIN; INT; x=IDENT; END;
@@ -59,11 +72,6 @@ var_decl:
 typed_ident:
 | t=typ; id=IDENT  { (id, t) }
 ;
-  
-typ:
-| INT   { TypInteger }
-| BOOL  { TypBoolean }
-;
 
 instructions:
 | (* empty *)                              { []      }
@@ -75,7 +83,41 @@ instruction:
 | WHILE; e=expression; b=block                      { While(e, b)   }
 | IF; e=expression; THEN; b1=block; ELSE; b2=block  { If(e, b1, b2) }
 | PRINT; BEGIN; e=expression; END                   { Print(e)      }
+| c=call {Print(Literal(Int(1)))}
 ;
+
+call:
+| IDENT; BEGIN; arguments; END {Print(Literal(Int(1)))}
+;
+
+arguments:
+| (* empty *)                                       {}
+| expr_in_arg; expression                           {}
+
+(* pour arguments *)
+expr_in_arg:
+| (* empty *)
+| expression; COMMA; expression                     {}
+;
+
+fun_decls:
+| (* empty *)
+| fun_decl; fun_decls {}
+;
+
+fun_decl:
+| IDENT; BEGIN; parameters; END; BEGIN; var_decls; instructions; END
+                                                    {}
+| typ; IDENT; BEGIN; parameters; END; BEGIN; var_decls; instructions; END
+                                                    {}
+parameters:
+| (* empty *) {}
+| typid_in_param; typ; IDENT {}
+
+(* pour parameters *)
+typid_in_param:
+| (* empty *)
+| typ; IDENT; COMMA; typid_in_param; {}
 
 block:
 | BEGIN; is=instructions; END        { is }
@@ -96,6 +138,12 @@ literal:
 location:
 | id=IDENT  { Identifier id }
 ;
+
+typ:
+| INT   { TypInteger }
+| BOOL  { TypBoolean }
+;
+
 
 %inline binop:
 | PLUS   { Add  }

@@ -1,0 +1,7 @@
+main(integer x) (
+    galouf(33);
+)
+
+galouf( integer n ) (
+  print(n);
+)

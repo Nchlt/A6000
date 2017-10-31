@@ -9,7 +9,7 @@ type label           = GotoAst.label
 type literal         = GotoAst.literal
 type identifier_info = GotoAst.identifier_info
 type binop           = GotoAst.binop
-    
+
 type main = {
   locals: identifier_info Symb_Tbl.t;
   code:   block;
@@ -24,16 +24,18 @@ and instruction =
   | Goto     of label                              (* Saut                    *)
   | CondGoto of value * label                      (* Saut conditionnel       *)
   | Comment  of string                             (* Commentaire             *)
+  | ProcCall of string * value list
+  | FunCall of identifier * string * value list
 
 and identifier = string (* Identifiant d'un registre virtuel *)
-    
+
 and value =
   | Literal    of literal    (* Valeur immédiate *)
   | Identifier of identifier (* Registre virtuel *)
 
 
 open Printf
-      
+
 let rec print_block = function
   | []          -> "\n"
   | (l, i) :: b -> sprintf "%s: %s\n%s" l (print_instruction i) (print_block b)
@@ -47,7 +49,7 @@ and print_instruction = function
   | Goto(lab)        -> sprintf "goto %s" lab
   | CondGoto(v, lab) -> sprintf "goto %s when %s" lab (print_value v)
   | Comment(c)       -> sprintf "# %s" c
-    
+
 and print_value = function
   | Literal(lit)   -> SourceAst.print_literal lit
   | Identifier(id) -> id

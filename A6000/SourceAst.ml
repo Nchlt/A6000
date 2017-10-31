@@ -2,12 +2,19 @@
 
 module Symb_Tbl = Map.Make(String)
 
+
+
+
+
+
+
 (* Programme principal : une table de symboles et un bloc de code *)
 type main = {
   locals: identifier_info Symb_Tbl.t;
   code: block;
 }
 
+and call = string * expression list
 (* La table des symboles contient, pour chaque variable :
    - sa nature  : variable locale ou paramètre formel
    - son type : entier ou booléen
@@ -27,11 +34,13 @@ and instruction =
   | While of expression * block         (* Boucle      *)
   | If    of expression * block * block (* Branchement *)
   | Print of expression                 (* Affichage   *)
+  | ProcCall of call                    (* Appel de procédure *)
 
 and expression =
   | Literal   of literal                         (* Valeur immédiate   *)
   | Location  of location                        (* Valeur en mémoire  *)
   | Binop     of binop * expression * expression (* Opération binaire  *)
+  | FunCall of call                              (* Appel de function  *)
 
 and literal =
   | Int  of int  (* Constante entière   *)
@@ -39,7 +48,7 @@ and literal =
 
 and location =
   | Identifier of string (* Variable en mémoire *)
-      
+
 and binop =
   | Add (* +  *) | Mult (* *  *) | Sub (* - *)
   | Eq  (* == *) | Neq  (* != *)
@@ -51,7 +60,7 @@ and binop =
    [print_main m] produit une chaîne de caractère représentant le programme
 *)
 open Printf
-      
+
 let print_typ = function
   | TypInteger -> "integer"
   | TypBoolean -> "boolean"

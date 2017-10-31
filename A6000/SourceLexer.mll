@@ -63,6 +63,8 @@ rule token = parse
       { AND }
   | "||"
       { OR }
+  | ","
+      { COMMA }
   | _
       { failwith ("Unknown character : " ^ (lexeme lexbuf)) }
   | eof

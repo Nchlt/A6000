@@ -25,6 +25,7 @@ type token =
   | ELSE
   | CONST_INT of (int)
   | CONST_BOOL of (bool)
+  | COMMA
   | BOOL
   | BEGIN
   | AND
